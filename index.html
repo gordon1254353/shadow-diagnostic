@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Block Diagnostic — Discover What's Really Blocking You</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f0f12;
+            color: #f5f5f7;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(196, 167, 125, 0.15);
+            border: 1px solid #c4a77d;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #c4a77d;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.4rem;
+            font-weight: 500;
+            color: #e8dcc8;
+            margin-bottom: 16px;
+        }
+
+        .subtitle { color: #a1a1aa; font-size: 1.05rem; }
+
+        .progress {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 40px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #333;
+            transition: all 0.3s;
+        }
+
+        .dot.active { background: #c4a77d; }
+        .dot.done { background: #6ee7b7; }
+
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: #18181d;
+            border: 1px solid #2a2a30;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .card-label {
+            font-size: 0.85rem;
+            color: #c4a77d;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .card p {
+            color: #a1a1aa;
+            margin-bottom: 16px;
+        }
+
+        .card p:last-child { margin-bottom: 0; }
+        .card p strong { color: #f5f5f7; }
+
+        .info {
+            background: #1e1e24;
+            border-left: 3px solid #c4a77d;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        .info.warning { border-left-color: #fcd34d; }
+        .info.green { border-left-color: #6ee7b7; }
+        .info.science { border-left-color: #60a5fa; }
+
+        .info p { margin: 0; font-size: 0.95rem; color: #a1a1aa; }
+        .info p + p { margin-top: 8px; }
+        .info strong { color: #f5f5f7; }
+
+        .what-you-get {
+            background: rgba(196, 167, 125, 0.08);
+            border: 1px solid rgba(196, 167, 125, 0.3);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 24px 0;
+        }
+
+        .what-you-get-title {
+            font-weight: 600;
+            color: #c4a77d;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+
+        .what-you-get ul { list-style: none; padding: 0; margin: 0; }
+
+        .what-you-get li {
+            padding: 6px 0;
+            padding-left: 24px;
+            position: relative;
+            color: #d1d1d6;
+            font-size: 0.95rem;
+        }
+
+        .what-you-get li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #6ee7b7;
+        }
+
+        .steps-list { margin: 24px 0; }
+
+        .step-item {
+            display: flex;
+            gap: 12px;
+            padding: 14px 16px;
+            background: #1e1e24;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .step-num {
+            width: 26px;
+            height: 26px;
+            min-width: 26px;
+            background: rgba(196, 167, 125, 0.2);
+            color: #c4a77d;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .step-text { color: #a1a1aa; font-size: 0.95rem; line-height: 1.6; }
+        .step-text strong { color: #f5f5f7; }
+
+        .example {
+            background: #1a1a1f;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .example-title {
+            font-size: 0.8rem;
+            color: #71717a;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+        }
+
+        .example p {
+            color: #d1d1d6;
+            font-size: 0.95rem;
+            margin: 0;
+            font-style: italic;
+        }
+
+        .science-box {
+            background: rgba(96, 165, 250, 0.08);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 24px 0;
+        }
+
+        .science-box-title {
+            font-weight: 600;
+            color: #60a5fa;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .science-box p {
+            color: #a1a1aa;
+            font-size: 0.9rem;
+            margin: 0;
+            line-height: 1.7;
+        }
+
+        .science-box p + p { margin-top: 10px; }
+
+        .slider-box {
+            background: #1e1e24;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .slider-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .slider-hint {
+            font-size: 0.85rem;
+            color: #71717a;
+            margin-bottom: 20px;
+        }
+
+        .slider-track {
+            width: 100%;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .slider-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.2s;
+        }
+
+        .slider-fill.shadow { background: linear-gradient(90deg, #6b4a4a, #8b5a5a); }
+        .slider-fill.light { background: linear-gradient(90deg, #c4a77d, #6ee7b7); }
+
+        input[type="range"] {
+            width: 100%;
+            position: relative;
+            top: -12px;
+            opacity: 0;
+            cursor: pointer;
+            height: 24px;
+        }
+
+        .slider-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.8rem;
+            color: #c4a77d;
+            font-weight: 500;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #71717a;
+            margin-top: 8px;
+        }
+
+        .options { margin: 20px 0; }
+
+        .option {
+            background: #1e1e24;
+            border: 1px solid #2a2a30;
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .option:hover { border-color: #c4a77d; }
+        .option.selected { background: rgba(196, 167, 125, 0.1); border-color: #c4a77d; }
+
+        .option-radio {
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            border: 2px solid #444;
+            border-radius: 50%;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+        }
+
+        .option.selected .option-radio {
+            border-color: #c4a77d;
+            background: #c4a77d;
+        }
+
+        .option.selected .option-radio::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #0f0f12;
+            border-radius: 50%;
+        }
+
+        .option-text h4 { font-size: 1rem; margin-bottom: 4px; }
+        .option-text p { font-size: 0.9rem; color: #71717a; margin: 0; line-height: 1.5; }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: #c4a77d;
+            color: #0f0f12;
+            flex: 1;
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        .btn-back {
+            background: #1e1e24;
+            color: #a1a1aa;
+            border: 1px solid #2a2a30;
+        }
+
+        .results-header {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #18181d, #1e1e24);
+            border: 1px solid #c4a77d;
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+
+        .results-header .icon { font-size: 3rem; margin-bottom: 16px; }
+        .results-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: #e8dcc8; margin-bottom: 8px; }
+        .results-header p { color: #a1a1aa; }
+
+        .result-block {
+            background: #18181d;
+            border: 1px solid #2a2a30;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .result-block h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.25rem;
+            color: #e8dcc8;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
+
+        .result-label { color: #a1a1aa; font-size: 0.95rem; }
+        .result-num { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: #c4a77d; font-weight: 500; }
+
+        .bar { height: 6px; background: #2a2a30; border-radius: 3px; margin-top: 8px; }
+        .bar-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+
+        .result-text { color: #a1a1aa; line-height: 1.8; font-size: 0.95rem; }
+        .result-text strong { color: #f5f5f7; }
+
+        .highlight-block {
+            background: rgba(196, 167, 125, 0.08);
+            border: 1px solid rgba(196, 167, 125, 0.4);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .highlight-block h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            color: #e8dcc8;
+            margin-bottom: 12px;
+        }
+
+        .summary-card {
+            background: #1e1e24;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 16px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #2a2a30;
+        }
+
+        .summary-row:last-child { border-bottom: none; }
+
+        .summary-label { color: #71717a; font-size: 0.9rem; }
+        .summary-value { color: #f5f5f7; font-size: 0.9rem; font-weight: 500; }
+
+        .testimonials { margin-top: 40px; }
+
+        .testimonials-title {
+            font-size: 0.8rem;
+            color: #71717a;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+        }
+
+        .testimonial {
+            background: #18181d;
+            border: 1px solid #2a2a30;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 12px;
+        }
+
+        .testimonial p { color: #e5e5e5; margin-bottom: 10px; font-size: 0.95rem; line-height: 1.6; }
+
+        .testimonial-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            color: #c4a77d;
+            background: rgba(196, 167, 125, 0.15);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .testimonials-note {
+            color: #71717a;
+            font-style: italic;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #2a2a30;
+            line-height: 1.6;
+        }
+
+        .cta {
+            background: #18181d;
+            border: 1px solid #c4a77d;
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        .cta-label {
+            font-size: 0.8rem;
+            color: #c4a77d;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+
+        .cta h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            margin-bottom: 12px;
+        }
+
+        .cta p { color: #a1a1aa; margin-bottom: 20px; font-size: 0.95rem; }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 16px 40px;
+            background: #c4a77d;
+            color: #0f0f12;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .cta-btn:hover { transform: translateY(-2px); }
+
+        .cta-note { margin-top: 12px; font-size: 0.8rem; color: #71717a; }
+
+        .time-estimate {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: #71717a;
+            margin-top: 12px;
+        }
+
+        /* Comparison section */
+        .option-compare {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .compare-item {
+            background: #1e1e24;
+            border: 1px solid #2a2a30;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .compare-item.highlight {
+            background: rgba(196, 167, 125, 0.08);
+            border-color: rgba(196, 167, 125, 0.4);
+        }
+
+        .compare-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .compare-icon {
+            font-size: 1.3rem;
+        }
+
+        .compare-header h4 {
+            font-size: 1rem;
+            color: #f5f5f7;
+            margin: 0;
+        }
+
+        .compare-item > p {
+            color: #a1a1aa;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .compare-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .compare-details span {
+            font-size: 0.8rem;
+            color: #71717a;
+        }
+
+        .compare-item.highlight .compare-details span {
+            color: #a1a1aa;
+        }
+
+        .honesty-block {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .honesty-block h3 {
+            color: #fca5a5;
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+
+        .signals-box {
+            background: rgba(167, 139, 250, 0.08);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 20px 0;
+        }
+
+        .signals-box-title {
+            font-weight: 600;
+            color: #a78bfa;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+
+        .signals-box p {
+            color: #a1a1aa;
+            font-size: 0.9rem;
+            margin: 6px 0;
+        }
+
+        @media (max-width: 640px) {
+            .container { padding: 40px 16px; }
+            .card { padding: 24px 20px; }
+            h1 { font-size: 2rem; }
+            .buttons { flex-direction: column; }
+            .btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="header">
+        <div class="badge">Free</div>
+        <h1>Shadow Block Diagnostic</h1>
+        <p class="subtitle">Discover what's really stopping your desires from manifesting</p>
+        <div class="time-estimate">⏱ 5 minutes</div>
+    </header>
+
+    <div class="progress">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+
+    <!-- ==================== STEP 0: INTRO ==================== -->
+    <div class="step active" id="step-0">
+        <div class="card">
+            <div class="card-label">Before we begin</div>
+            <h2 class="card-title">Why This Diagnostic Matters</h2>
+            
+            <p>Sound familiar? You set a goal, visualize, work hard — but results don't come. Or they come and disappear. Or you get the opposite of what you wanted.</p>
+            
+            <p>The problem isn't what you're doing. The problem is that there's a <strong>hidden block</strong> inside you — a part that's working against your conscious desires.</p>
+
+            <div class="info">
+                <p><strong>This is called your Shadow</strong> — everything you've suppressed about yourself: fears, resentment, shame, anger, pain. These emotions didn't disappear — they went into the "basement" of your psyche.</p>
+                <p style="margin-top: 10px;">And from there, they <strong>run your reality</strong>. Because what manifests isn't what you want with your mind — it's what carries the most emotional weight.</p>
+            </div>
+
+            <div class="science-box">
+                <div class="science-box-title">⚡ The Potential Difference Principle</div>
+                <p>Think of it like electricity. Current flows because there's a <strong>difference in potential</strong> between two poles — positive and negative. No difference = no current = nothing happens.</p>
+                <p>Your psyche works the same way. You have a <strong>Persona</strong> (the "light" side — who you think you are, what you want) and a <strong>Shadow</strong> (the hidden side — suppressed emotions, denied parts of yourself).</p>
+                <p><strong>The gap between them is what generates your life.</strong> Everything you have right now — your relationships, money, health, opportunities — is the result of this internal "voltage."</p>
+                <p style="color: #60a5fa; margin-top: 10px;">When shadow is heavier than persona → reality reflects the shadow (problems, blocks, "bad luck").<br>When they're integrated → energy flows freely toward your actual goals.</p>
+            </div>
+
+            <div class="what-you-get">
+                <div class="what-you-get-title">What you'll discover:</div>
+                <ul>
+                    <li>Your exact shadow-to-light ratio</li>
+                    <li>Where your block comes from (this life, ancestry, or deeper)</li>
+                    <li>Your core pattern — which duality you're stuck in</li>
+                    <li>Specific insights on what to do next</li>
+                </ul>
+            </div>
+
+            <p style="color: #c4a77d;">This diagnostic works through your body, not your mind — so results will be honest, not what you "want" to see.</p>
+
+            <div class="info green">
+                <p><strong>Important:</strong> This method works for <em>any</em> goal — money, relationships, health, career, creativity, confidence. The shadow doesn't care what you're trying to achieve. It blocks everything equally. Once integrated, energy flows freely toward whatever you choose.</p>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-primary" onclick="next()">Start Diagnostic →</button>
+        </div>
+    </div>
+
+    <!-- ==================== STEP 1: CALIBRATION ==================== -->
+    <div class="step" id="step-1">
+        <div class="card">
+            <div class="card-label">Step 1 of 4</div>
+            <h2 class="card-title">Learning to Read Your Body</h2>
+            
+            <p>I'm going to teach you a simple technique that lets you get honest answers from your body. This takes 2 minutes, but without it, the diagnostic won't work.</p>
+
+            <div class="science-box">
+                <div class="science-box-title">🔬 The Science Behind This</div>
+                <p><strong>Your body knows before your mind does.</strong> Neuroscientist Antonio Damasio discovered what he calls "somatic markers" — your body creates physical signals (changes in heart rate, breathing, muscle tension) in response to decisions, and these signals influence your choices before conscious thought kicks in.</p>
+                <p>His research shows that people with damage to the brain areas connecting body signals to decision-making make consistently poor choices — even when they intellectually "know" the right answer. <strong>The body isn't just along for the ride. It's a primary source of truth.</strong></p>
+            </div>
+
+            <div class="info green">
+                <p><strong>Why the body, not the mind?</strong></p>
+                <p>Your mind lies. It tells you what's "right" or what you want to hear. Your body can't lie — it responds directly to truth and falsehood.</p>
+            </div>
+
+            <p><strong>The principle is simple:</strong> when you speak truth — your body feels light. When you speak falsehood — heaviness, tension, or discomfort appears.</p>
+
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <div class="step-text"><strong>Get two identical small objects</strong> — two coins, two pens, two stones. They should look similar.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <div class="step-text"><strong>Mentally assign</strong> one object as "Frustration/Disappointment" and the other as "Joy/Satisfaction." Just decide: this one is frustration, this one is joy.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <div class="step-text"><strong>Place them in front of you</strong> at equal distance. Relax. Without thinking, feel — which object does your hand want to reach for? That's your dominant emotion right now.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">4</div>
+                    <div class="step-text"><strong>Pick up the "Frustration" object.</strong> Hold your attention on the object AND on your chest area simultaneously. This is important — two points of focus.</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">5</div>
+                    <div class="step-text"><strong>Start counting out loud:</strong> "I am in a state of frustration and disappointment at 10 percent... at 20 percent... at 30 percent..."</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">6</div>
+                    <div class="step-text"><strong>Track your sensations.</strong> At some percentage, your body will give you a signal. That's your real percentage.</div>
+                </div>
+            </div>
+
+            <div class="signals-box">
+                <div class="signals-box-title">🔍 Body Signals to Watch For:</div>
+                <p>• <strong>Breathing slows down or becomes heavier</strong> — very common</p>
+                <p>• <strong>Heaviness in chest, throat, or stomach</strong> — like something pressing down</p>
+                <p>• <strong>Tightness, a lump, tension</strong> — anywhere in the body</p>
+                <p>• <strong>Words become harder to say</strong> — they "get stuck"</p>
+                <p>• <strong>Thoughts become heavier</strong> — like thinking gets harder</p>
+                <p>• <strong>Slight nausea or discomfort</strong></p>
+                <p style="margin-top: 12px; color: #d1d1d6;">Any of these signals = you found your percentage. Trust the first sensation.</p>
+            </div>
+
+            <div class="example">
+                <div class="example-title">Example</div>
+                <p>You say "at 10%... at 20%... at 30%..." — everything feels fine, breathing is easy. At 40%, you notice — breathing slowed slightly, something tightened in your chest. Your frustration level is around 40%.</p>
+            </div>
+
+            <div class="honesty-block">
+                <h3>⚠️ Critical: Absolute Honesty Required</h3>
+                <p class="result-text">
+                    <strong>This diagnostic only works if you're honest with yourself.</strong><br><br>
+                    Common traps:<br>
+                    • Lowering percentages because "high numbers are bad"<br>
+                    • Ignoring subtle body signals because "that's nothing"<br>
+                    • Choosing "nice" answers instead of honest ones<br><br>
+                    <strong>The truth:</strong> Whatever percentage comes up — it's not a verdict. It's a starting point. Someone with 80% shadow who honestly admits it transforms faster than someone with 40% who lies to themselves that it's 15%.<br><br>
+                    <span style="color: #c4a77d;">The more accurately you measure, the more effective the work will be.</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-back" onclick="prev()">← Back</button>
+            <button class="btn btn-primary" onclick="next()">Got It, Continue →</button>
+        </div>
+    </div>
+
+    <!-- ==================== STEP 2: MEASUREMENT ==================== -->
+    <div class="step" id="step-2">
+        <div class="card">
+            <div class="card-label">Step 2 of 4</div>
+            <h2 class="card-title">Measure Your Charge</h2>
+            
+            <p>Now apply the method from the previous step. First measure frustration (with the "Frustration" object), then joy (with the "Joy" object).</p>
+            
+            <p>Record the percentage where you felt the body signal.</p>
+
+            <div class="slider-box">
+                <div class="slider-title">Frustration / Disappointment</div>
+                <div class="slider-hint">At what percentage did you feel heaviness?</div>
+                <div class="slider-track">
+                    <div class="slider-fill shadow" id="shadowFill" style="width: 0%"></div>
+                </div>
+                <input type="range" min="0" max="100" value="0" id="shadowSlider" oninput="updateSlider('shadow')">
+                <div class="slider-value" id="shadowValue">0%</div>
+                <div class="slider-labels"><span>0% — none at all</span><span>100% — maximum</span></div>
+            </div>
+
+            <div class="slider-box">
+                <div class="slider-title">Joy / Satisfaction</div>
+                <div class="slider-hint">At what percentage did you feel lightness?</div>
+                <div class="slider-track">
+                    <div class="slider-fill light" id="lightFill" style="width: 0%"></div>
+                </div>
+                <input type="range" min="0" max="100" value="0" id="lightSlider" oninput="updateSlider('light')">
+                <div class="slider-value" id="lightValue">0%</div>
+                <div class="slider-labels"><span>0% — none at all</span><span>100% — maximum</span></div>
+            </div>
+
+            <div class="info">
+                <p><strong>Note:</strong> If both are low — this might indicate "frozenness," suppressed emotions. If both are high — strong emotional activity. The difference between them shows what dominates.</p>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-back" onclick="prev()">← Back</button>
+            <button class="btn btn-primary" id="btn2" onclick="next()" disabled>Continue →</button>
+        </div>
+    </div>
+
+    <!-- ==================== STEP 3: ORIGIN ==================== -->
+    <div class="step" id="step-3">
+        <div class="card">
+            <div class="card-label">Step 3 of 4</div>
+            <h2 class="card-title">Where Did This Block Come From?</h2>
+            
+            <p>Shadow blocks form at different levels. Understanding the source determines how to work with it.</p>
+            
+            <p><strong>How to check:</strong> use the same calibration. For each option below, hold the thought and count percentages. Where the highest charge is — that's the root of your block.</p>
+
+            <div class="options">
+                <div class="option" onclick="select(this, 'origin', 'personal')">
+                    <div class="option-radio"></div>
+                    <div class="option-text">
+                        <h4>Personal (this lifetime)</h4>
+                        <p>Block came from your own experience — childhood trauma, painful relationships, failures, decisions made under pressure</p>
+                    </div>
+                </div>
+                <div class="option" onclick="select(this, 'origin', 'ancestral')">
+                    <div class="option-radio"></div>
+                    <div class="option-text">
+                        <h4>Ancestral (family system)</h4>
+                        <p>Inherited pattern from parents, grandparents, or further back in your lineage. Often shows as repeating family scenarios — divorces, bankruptcies, illnesses</p>
+                    </div>
+                </div>
+                <div class="option" onclick="select(this, 'origin', 'karmic')">
+                    <div class="option-radio"></div>
+                    <div class="option-text">
+                        <h4>Karmic (soul level)</h4>
+                        <p>Deep pattern that feels older than this lifetime. Unexplainable fears, strong attractions, a sense of "this is just who I am" with no visible cause</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-back" onclick="prev()">← Back</button>
+            <button class="btn btn-primary" id="btn3" onclick="next()" disabled>Continue →</button>
+        </div>
+    </div>
+
+    <!-- ==================== STEP 4: PATTERN ==================== -->
+    <div class="step" id="step-4">
+        <div class="card">
+            <div class="card-label">Step 4 of 4</div>
+            <h2 class="card-title">Which Duality Are You Stuck In?</h2>
+            
+            <p>Shadow always manifests through extremes — a person swings from one pole to the other, never finding balance.</p>
+            
+            <p><strong>How to identify:</strong> read each pair and feel where there's the most tension in your body. Where it "hooks" you strongest — that's your pattern.</p>
+
+            <div class="options">
+                <div class="option" onclick="select(this, 'pattern', 'self-others')">
+                    <div class="option-radio"></div>
+                    <div class="option-text">
+                        <h4>Self ↔ Others</h4>
+                        <p>Either dissolving into others (people-pleasing, forgetting yourself, codependency) — or complete isolation (trusting no one, doing everything alone)</p>
+                    </div>
+                </div>
+                <div class="option" onclick="select(this, 'pattern', 'control-chaos')">
+                    <div class="option-radio"></div>
+                    <div class="option-text">
+                        <h4>Control ↔ Chaos</h4>
+                        <p>Either controlling everything obsessively (perfectionism, anxiety) — or surrendering to chaos (procrastination, avoidance, "whatever happens, happens")</p>
+                    </div>
+                </div>
+                <div class="option" onclick="select(this, 'pattern', 'take-give')">
+                    <div class="option-radio"></div>
+                    <div class="option-text">
+                        <h4>Taking ↔ Giving</h4>
+                        <p>Either taking with guilt (feeling undeserving, must "earn" everything) — or giving until depleted (self-sacrifice, then resentment)</p>
+                    </div>
+                </div>
+                <div class="option" onclick="select(this, 'pattern', 'safety-risk')">
+                    <div class="option-radio"></div>
+                    <div class="option-text">
+                        <h4>Safety ↔ Risk</h4>
+                        <p>Either staying in comfort zone (missing opportunities, fear of change) — or sabotaging stability (destroying what you've built, fear of success)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-back" onclick="prev()">← Back</button>
+            <button class="btn btn-primary" id="btn4" onclick="showResults()" disabled>Show Results →</button>
+        </div>
+    </div>
+
+    <!-- ==================== RESULTS ==================== -->
+    <div class="step" id="step-results">
+        <div class="results-header">
+            <div class="icon">🔮</div>
+            <h2>Your Diagnostic Is Ready</h2>
+            <p>Here's what's shaping your reality right now</p>
+        </div>
+
+        <div class="result-block">
+            <h3>📋 Your Map</h3>
+            <div class="summary-card">
+                <div class="summary-row">
+                    <span class="summary-label">Shadow charge</span>
+                    <span class="summary-value" id="sumShadow">—</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Light charge</span>
+                    <span class="summary-value" id="sumLight">—</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Block origin</span>
+                    <span class="summary-value" id="sumOrigin">—</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Pattern</span>
+                    <span class="summary-value" id="sumPattern">—</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-block">
+            <h3>⚖️ Shadow-Light Balance</h3>
+            
+            <div class="result-row">
+                <span class="result-label">Shadow (frustration/disappointment)</span>
+                <span class="result-num" id="resShadow">0%</span>
+            </div>
+            <div class="bar"><div class="bar-fill" id="barShadow" style="width: 0%; background: linear-gradient(90deg, #6b4a4a, #8b5a5a);"></div></div>
+            
+            <div class="result-row" style="margin-top: 20px;">
+                <span class="result-label">Light (joy/satisfaction)</span>
+                <span class="result-num" id="resLight">0%</span>
+            </div>
+            <div class="bar"><div class="bar-fill" id="barLight" style="width: 0%; background: linear-gradient(90deg, #c4a77d, #6ee7b7);"></div></div>
+
+            <p class="result-text" style="margin-top: 20px;" id="ratioText"></p>
+        </div>
+
+        <div class="result-block">
+            <h3>🌳 Origin of Your Block</h3>
+            <p class="result-text" id="originText"></p>
+        </div>
+
+        <div class="result-block">
+            <h3>⚡ Your Duality Pattern</h3>
+            <p class="result-text" id="patternText"></p>
+        </div>
+
+        <div class="highlight-block">
+            <h3>💡 What This All Means & What To Do</h3>
+            <p class="result-text" id="mainText"></p>
+        </div>
+
+        <!-- What's Next Options -->
+        <div class="result-block">
+            <h3>🛤️ Your Options From Here</h3>
+            <p class="result-text" style="margin-bottom: 20px;">Now that you know your configuration, you have several paths forward:</p>
+            
+            <div class="option-compare">
+                <div class="compare-item">
+                    <div class="compare-header">
+                        <span class="compare-icon">🛋️</span>
+                        <h4>Traditional Therapy</h4>
+                    </div>
+                    <p>Work with a psychologist or therapist. They can help you explore these patterns in depth over time.</p>
+                    <div class="compare-details">
+                        <span>⏱ Timeline: 6-24 months typically</span>
+                        <span>💰 Investment: $100-200/session × 20-50+ sessions</span>
+                        <span>✓ Good for: Deep trauma, clinical issues</span>
+                    </div>
+                </div>
+                
+                <div class="compare-item">
+                    <div class="compare-header">
+                        <span class="compare-icon">📚</span>
+                        <h4>Self-Study</h4>
+                    </div>
+                    <p>Read books on shadow work (Jung, Robert Bly, Debbie Ford). Practice on your own through journaling and meditation.</p>
+                    <div class="compare-details">
+                        <span>⏱ Timeline: Varies widely, often years</span>
+                        <span>💰 Investment: $50-200 in books</span>
+                        <span>✓ Good for: Intellectual understanding</span>
+                    </div>
+                </div>
+                
+                <div class="compare-item highlight">
+                    <div class="compare-header">
+                        <span class="compare-icon">⚡</span>
+                        <h4>Guided Integration Method</h4>
+                    </div>
+                    <p>Structured body-based protocols designed to integrate shadow material quickly, with specific techniques for each block type.</p>
+                    <div class="compare-details">
+                        <span>⏱ Timeline: 2-4 weeks for visible shifts</span>
+                        <span>💰 Investment: One-time course fee</span>
+                        <span>✓ Good for: Fast, practical results</span>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="result-text" style="margin-top: 20px; font-style: italic; color: #71717a;">There's no "wrong" choice — each path has value. The question is: how quickly do you want results, and how much are you willing to invest (in time and money)?</p>
+        </div>
+
+        <div class="testimonials">
+            <div class="testimonials-title">Results from those who completed the transformation (2-4 weeks):</div>
+            
+            <div class="testimonial">
+                <p>"Finished the practice. Immediately got a message from a potential client — the very second I was done. Deal in progress."</p>
+                <span class="testimonial-tag">Focus: Money</span>
+            </div>
+
+            <div class="testimonial">
+                <p>"This week — got a raise, and a couple of 'admirers' appeared out of nowhere with gifts."</p>
+                <span class="testimonial-tag">Money & Relationships</span>
+            </div>
+
+            <div class="testimonial">
+                <p>"1 session before my speaking event — amazing state! First time as a speaker, zero anxiety. You create miracles 🙏"</p>
+                <span class="testimonial-tag">Confidence</span>
+            </div>
+
+            <p class="testimonials-note">There's no such thing as internal change without external response. Real transformation is always visible on the outside — and quickly.</p>
+        </div>
+
+        <div class="cta">
+            <div class="cta-label">Next Step</div>
+            <h3>Deep Transformation Course</h3>
+            <p>The complete shadow integration method that pulled me out of years of depression and changed my life in a month. Now it's your turn.</p>
+            <a href="YOUR_COURSE_LINK" class="cta-btn">Get the Course — $127</a>
+            <p class="cta-note">Shadow work • Ancestral patterns • Body-based techniques • Lifetime access</p>
+        </div>
+    </div>
+</div>
+
+<script>
+let step = 0;
+let data = { shadow: 0, light: 0, origin: '', pattern: '' };
+
+function updateDots() {
+    document.querySelectorAll('.dot').forEach((d, i) => {
+        d.className = 'dot' + (i < step ? ' done' : i === step ? ' active' : '');
+    });
+}
+
+function show(n) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById(n === 5 ? 'step-results' : 'step-' + n).classList.add('active');
+    step = n;
+    updateDots();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function next() { show(step + 1); }
+function prev() { show(step - 1); }
+
+function updateSlider(type) {
+    const val = document.getElementById(type + 'Slider').value;
+    document.getElementById(type + 'Fill').style.width = val + '%';
+    document.getElementById(type + 'Value').textContent = val + '%';
+    data[type] = parseInt(val);
+    document.getElementById('btn2').disabled = !(data.shadow || data.light);
+}
+
+function select(el, type, val) {
+    el.parentElement.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    data[type] = val;
+    document.getElementById(type === 'origin' ? 'btn3' : 'btn4').disabled = false;
+}
+
+function showResults() {
+    show(5);
+    
+    setTimeout(() => {
+        document.getElementById('barShadow').style.width = data.shadow + '%';
+        document.getElementById('barLight').style.width = data.light + '%';
+        document.getElementById('resShadow').textContent = data.shadow + '%';
+        document.getElementById('resLight').textContent = data.light + '%';
+    }, 300);
+
+    const originLabels = { personal: 'Personal', ancestral: 'Ancestral', karmic: 'Karmic' };
+    const patternLabels = { 
+        'self-others': 'Self ↔ Others', 
+        'control-chaos': 'Control ↔ Chaos',
+        'take-give': 'Taking ↔ Giving',
+        'safety-risk': 'Safety ↔ Risk'
+    };
+    
+    document.getElementById('sumShadow').textContent = data.shadow + '%';
+    document.getElementById('sumLight').textContent = data.light + '%';
+    document.getElementById('sumOrigin').textContent = originLabels[data.origin] || '—';
+    document.getElementById('sumPattern').textContent = patternLabels[data.pattern] || '—';
+
+    const diff = data.shadow - data.light;
+    let ratio;
+    
+    if (diff > 30) {
+        ratio = `<strong>Shadow significantly outweighs light (+${diff}%).</strong><br><br>This means unconscious programs have more "weight" than your conscious desires. When you set a goal, there's something inside actively pulling in the opposite direction. This isn't about willpower or "not trying hard enough" — it's literally the physics of the psyche. While shadow is heavier, it determines reality.`;
+    } else if (diff > 10) {
+        ratio = `<strong>Shadow outweighs light (+${diff}%).</strong><br><br>There's a noticeable imbalance working against your desires. This explains why some things stall or results come slower than you'd like. The block isn't critical, but it exists — and it's affecting you.`;
+    } else if (diff > -10) {
+        ratio = `<strong>Approximate balance between shadow and light.</strong><br><br>This is a good foundation! Your system is relatively balanced. But understand: even a small shadow charge can block specific life areas — money, relationships, health. If something "isn't working" — there's likely a point block there.<br><br><span style="color: #6ee7b7;"><strong>✓ Good news:</strong> With this base, results from the practice come faster. You don't need to clear out mountains — just targeted work with your specific pattern.</span>`;
+    } else if (diff > -30) {
+        ratio = `<strong>More light than shadow — good sign!</strong><br><br>Your system is in positive balance. This means you already have resources for manifesting desires.<br><br><span style="color: #6ee7b7;"><strong>✓ Great news:</strong> With this base, transformation goes quickly. Practices will amplify what's already working and remove point blocks. Expect results within 1-2 weeks of active work.</span><br><br>But check yourself: is this real integration or suppression of negativity? If you're used to "not noticing" heavy emotions — they didn't disappear, just went deeper.`;
+    } else {
+        ratio = `<strong>Significantly more light — excellent result!</strong><br><br>You've already done serious inner work, or you naturally have a healthy psyche.<br><br><span style="color: #6ee7b7;"><strong>✓ This means:</strong> practices will give results very quickly. You're not starting from zero — you're amplifying what already exists. Work with your specific pattern (see below) can show visible changes in reality within the first week.</span><br><br>Just make sure high "light" isn't avoidance of shadow. True balance includes acceptance of all parts of yourself.`;
+    }
+    document.getElementById('ratioText').innerHTML = ratio;
+
+    const origins = {
+        personal: `<strong>Your block is from this lifetime.</strong><br><br>It formed from specific events: childhood trauma, painful relationships, failures, decisions made under pressure. Good news: these transform fastest because memories are accessible. Work involves returning to these events with new awareness and releasing "stuck" emotions.`,
+        
+        ancestral: `<strong>Your block is ancestral.</strong><br><br>You're carrying a pattern you didn't create. It came from parents, grandparents, or further back in your lineage. This often shows as repeating family scenarios: if divorces, bankruptcies, early deaths happened in your family — the pattern often repeats. Work requires acknowledging what belongs to ancestors and symbolically "returning" that weight to them.`,
+        
+        karmic: `<strong>Your block is at soul level.</strong><br><br>This is a deep pattern that feels older than this lifetime. It might show as unexplainable fears (unconnected to any experience), strong attractions, or simply a sense of "this is just who I am — always have been, always will be." These require the deepest work but give the most powerful transformation.`
+    };
+    document.getElementById('originText').innerHTML = origins[data.origin] || '';
+
+    const patterns = {
+        'self-others': `<strong>You're stuck in the Self ↔ Others duality.</strong><br><br>Swinging between two extremes: either dissolving into people (people-pleasing, forgetting your needs, living others' goals) — or complete isolation (trusting no one, doing everything yourself, loneliness). In the shadow there's likely a deep fear: either of being abandoned, or of being "swallowed" by others. Integration means learning to be fully yourself while staying in living contact with people.`,
+        
+        'control-chaos': `<strong>You're stuck in the Control ↔ Chaos duality.</strong><br><br>Either gripping life with a death grip (perfectionism, micromanagement, anxiety about uncertainty) — or surrendering to chaos (procrastination, avoidance, "whatever happens"). Behind this usually lies fear of helplessness — at some point you were in a situation where you couldn't control anything, and it was unbearable. Integration means learning to exist steadily in uncertainty.`,
+        
+        'take-give': `<strong>You're stuck in the Taking ↔ Giving duality.</strong><br><br>Either taking with huge guilt (feeling "undeserving," must "earn" everything) — or giving until complete depletion (self-sacrifice, then resentment that you're not appreciated). In the shadow often lie beliefs about your own worth and right to receive. Integration means balanced healthy exchange: taking fully, giving freely, without guilt or sacrifice.`,
+        
+        'safety-risk': `<strong>You're stuck in the Safety ↔ Risk duality.</strong><br><br>Either sitting in comfort zone (missing opportunities, fearing change, "the good is enemy of the best") — or sabotaging stability (destroying what you've built, self-sabotage before success). In the shadow may lie fear of what happens if you truly succeed. Integration means learning to hold the discomfort of growth and allowing yourself to have more.`
+    };
+    document.getElementById('patternText').innerHTML = patterns[data.pattern] || '';
+
+    document.getElementById('mainText').innerHTML = `
+        <strong>Your configuration:</strong> ${data.shadow}% shadow, ${data.light}% light, origin — ${originLabels[data.origin]?.toLowerCase()}, pattern — ${patternLabels[data.pattern]}.<br><br>
+        
+        <strong>What this means in practice:</strong> Right now, you're running on a "voltage" of ${Math.abs(diff)}% ${diff > 0 ? 'toward shadow' : diff < 0 ? 'toward light' : 'balanced'}. This isn't good or bad — it's physics. Everything in your life right now — your money situation, relationships, opportunities, health — is the output of this internal configuration.<br><br>
+        
+        ${diff > 0 ? `Because your shadow currently outweighs your conscious desires, your reality will keep reflecting the shadow patterns until the balance shifts. It's not about "thinking positive" — it's about changing the actual weight distribution in your system.` : diff < 0 ? `Because your light outweighs shadow, you have natural momentum toward your goals. The remaining shadow (your specific pattern) is what's creating friction in specific areas.` : `With balance, you have a neutral starting point. Your specific pattern determines where you'll feel most friction.`}<br><br>
+        
+        <strong>The path isn't to "kill" the shadow</strong> — that's impossible and harmful. The path is to <strong>integrate</strong> it: acknowledge it, process the suppressed emotions, reclaim your energy from the shadow.<br><br>
+        
+        When this happens, two things occur: first, a huge amount of energy that was going into suppression gets freed up. Second, the emotional "weight" shifts — and your desires start manifesting, because now they're "heavier" than fears.<br><br>
+        
+        <span style="color: #c4a77d;"><strong>Remember:</strong> This method works for ANY goal you set — money, relationships, health, career, creativity. The shadow blocks everything equally. Once integrated, energy flows freely toward whatever you choose.</span>
+    `;
+}
+</script>
+
+</body>
+</html>
