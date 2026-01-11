@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Experiences — DTI Shadow Work</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #f0f0f0;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #888;
+            font-size: 1.05rem;
+        }
+
+        .intro-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .intro-box h2 {
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            color: #e0e0e0;
+        }
+
+        .intro-box p {
+            color: #a0a0a0;
+            margin-bottom: 8px;
+        }
+
+        .intro-box .highlight-text {
+            color: #8b5cf6;
+            font-weight: 600;
+            margin-top: 16px;
+            font-size: 1.1rem;
+        }
+
+        .testimonial {
+            background: #111118;
+            border: 1px solid #2a2a3a;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .testimonial-number {
+            position: absolute;
+            top: -12px;
+            left: 24px;
+            background: #6366f1;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .testimonial p {
+            margin-bottom: 12px;
+            color: #c0c0c0;
+        }
+
+        .testimonial p:last-child {
+            margin-bottom: 0;
+        }
+
+        .highlight {
+            color: #a78bfa;
+            font-weight: 500;
+        }
+
+        .result-tag {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            margin-top: 16px;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            margin-top: 48px;
+            padding: 40px 32px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .cta-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        .cta-section p {
+            color: #a0a0a0;
+            margin-bottom: 24px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(99, 102, 241, 0.5);
+        }
+
+        /* Telegram */
+        .telegram-section {
+            text-align: center;
+            margin-top: 32px;
+            padding: 20px;
+            background: #111118;
+            border: 1px solid #2a2a3a;
+            border-radius: 12px;
+        }
+
+        .telegram-section p {
+            color: #888;
+            margin-bottom: 12px;
+        }
+
+        .telegram-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 8px;
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .telegram-btn:hover {
+            background: rgba(99, 102, 241, 0.25);
+        }
+
+        /* Back link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #888;
+            text-decoration: none;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #6366f1;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 24px 16px;
+            }
+            
+            .testimonial {
+                padding: 24px 20px;
+            }
+
+            .cta-section {
+                padding: 32px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <a href="#" class="back-link" onclick="history.back()">← Back to Diagnostic</a>
+
+    <div class="header">
+        <h1>Real Experiences</h1>
+        <p>No BS, just honest stories from people who did the work</p>
+    </div>
+
+    <div class="intro-box">
+        <h2>I tested this method with a small group</h2>
+        <p>Worked with real people, real problems</p>
+        <p>Tested what works and what doesn't</p>
+        <p>Refined the protocols based on feedback</p>
+        <p class="highlight-text">These are their stories</p>
+    </div>
+
+    <!-- TESTIMONIAL 1 -->
+    <div class="testimonial">
+        <div class="testimonial-number">1</div>
+        <p>so today I did the diagnostic</p>
+        <p>and I asked myself "what's blocking you?"</p>
+        <p>expected something like money, success, whatever</p>
+        <p>but instead got:</p>
+        <p><span class="highlight">"you don't deserve to be happy"</span></p>
+        <p>I was like... what?</p>
+        <p>that wasn't even on my radar</p>
+        <p>but my body confirmed it instantly</p>
+        <p>sitting here realizing that my whole life I've been sabotaging my own happiness</p>
+        <p>not money, not career — <span class="highlight">happiness itself</span></p>
+        <p>this is just the first session and I'm already shook</p>
+    </div>
+
+    <!-- TESTIMONIAL 2 -->
+    <div class="testimonial">
+        <div class="testimonial-number">2</div>
+        <p>alright I have to share this</p>
+        <p>three days after working through the fear block</p>
+        <p><span class="highlight">a client I pitched 6 months ago suddenly messaged me</span></p>
+        <p>said they're "finally ready" to work together</p>
+        <p>I didn't do anything</p>
+        <p>didn't follow up, didn't push</p>
+        <p>just did the internal work</p>
+        <p>coincidence? maybe</p>
+        <p>but this is the third "coincidence" this month</p>
+        <div class="result-tag">✓ Got a client without trying</div>
+    </div>
+
+    <!-- TESTIMONIAL 3 -->
+    <div class="testimonial">
+        <div class="testimonial-number">3</div>
+        <p>been doing this for 2 weeks</p>
+        <p>and <span class="highlight">my relationship with my mom completely shifted</span></p>
+        <p>we used to fight constantly</p>
+        <p>like every conversation turned into an argument</p>
+        <p>turns out I was carrying this massive resentment</p>
+        <p>didn't even know it was there</p>
+        <p>did the ancestral work</p>
+        <p>cried for like an hour</p>
+        <p>called her the next day</p>
+        <p>and for the first time in years we just... talked</p>
+        <p>no fighting, no tension</p>
+        <p>this is wild</p>
+        <div class="result-tag">✓ Healed family relationship</div>
+    </div>
+
+    <!-- TESTIMONIAL 4 -->
+    <div class="testimonial">
+        <div class="testimonial-number">4</div>
+        <p>OKAY SO</p>
+        <p><span class="highlight">I opened a store</span></p>
+        <p>MY OWN STORE</p>
+        <p>been talking about this for 5 years</p>
+        <p>"I'm gonna do it, I'm gonna open one"</p>
+        <p>never did</p>
+        <p>started the flow-list and first tasks were ridiculous</p>
+        <p>"drink a glass of water" — seriously???</p>
+        <p>but I did it anyway</p>
+        <p>then "do 10 squats", then "call a friend"</p>
+        <p>end of week 2 suddenly: "order curtains for the store"</p>
+        <p>wait what</p>
+        <p>but I ordered them</p>
+        <p>and it snowballed from there</p>
+        <p><span class="highlight">thoughts are nothing, ACTION is everything</span></p>
+        <p>in 2 months opened the store, got first clients</p>
+        <div class="result-tag">✓ Opened her own business</div>
+    </div>
+
+    <!-- TESTIMONIAL 5 -->
+    <div class="testimonial">
+        <div class="testimonial-number">5</div>
+        <p>week 3, sitting here doing the practice</p>
+        <p>and it just hit me</p>
+        <p><span class="highlight">my whole life I was scared of being abandoned</span></p>
+        <p><span class="highlight">so I never let anyone get close</span></p>
+        <p>if I leave first — I won't get hurt</p>
+        <p>been living like this since I was 16</p>
+        <p>I'm 32 now</p>
+        <p>SIXTEEN YEARS</p>
+        <p>how did I not see this???</p>
+        <p>sitting here crying</p>
+        <p>but it's like... relief tears</p>
+        <p>because <span class="highlight">when you SEE the problem — you're already halfway there</span></p>
+        <p>after this session something inside released</p>
+        <p>I can feel that I'm not scared anymore</p>
+        <div class="result-tag">✓ Released 16-year fear pattern</div>
+    </div>
+
+    <!-- TESTIMONIAL 6 -->
+    <div class="testimonial">
+        <div class="testimonial-number">6</div>
+        <p>wanna share this so others don't make the same mistake</p>
+        <p>did the goal-setting protocol, body said <span class="highlight">$2.5k a month</span></p>
+        <p>I was making $1k at the time</p>
+        <p>thought "that's too low, I want more"</p>
+        <p>pushed through with willpower</p>
+        <p>hit $4k one month</p>
+        <p>felt amazing</p>
+        <p>but then crashed</p>
+        <p>burned out completely</p>
+        <p>back to $800</p>
+        <p>went back to DTI</p>
+        <p>set $2.5k again</p>
+        <p>this time I ACCEPTED it</p>
+        <p>because I learned: <span class="highlight">don't fight your subconscious, work WITH it</span></p>
+        <p>now steady at $2.5-3k and growing slowly</p>
+        <p>no burnout, sustainable</p>
+        <div class="result-tag">✓ Found sustainable income level</div>
+    </div>
+
+    <!-- TESTIMONIAL 7 -->
+    <div class="testimonial">
+        <div class="testimonial-number">7</div>
+        <p>writing this 2 months after finishing</p>
+        <p>came in wanting to increase income</p>
+        <p>making $1.5k, wanted $3k</p>
+        <p>week 1 — nothing happening</p>
+        <p>week 2 — noticed <span class="highlight">how I talk to myself in my head</span></p>
+        <p>"you're not good enough", "who are you to charge that"</p>
+        <p>didn't even know I had these thoughts</p>
+        <p>week 3 — something shifted</p>
+        <p>started looking at myself differently</p>
+        <p>week 4 — <span class="highlight">raised my prices</span></p>
+        <p>just did it</p>
+        <p>wouldn't have had the guts before</p>
+        <p>now I KNOW I'm worth it</p>
+        <p>current results:</p>
+        <p>income — $3.2k (hit my goal)</p>
+        <p>self-esteem — completely different</p>
+        <p>the problem wasn't money</p>
+        <p><span class="highlight">the problem was I didn't think I DESERVED it</span></p>
+        <p><span class="highlight">when that changed — everything changed</span></p>
+        <div class="result-tag">✓ Doubled income + self-worth shift</div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="cta-section">
+        <h3>Ready to start your transformation?</h3>
+        <p>These people did the work. Now it's your turn.</p>
+        <a href="https://app.lava.top/products/91f0a61b-4cc9-4fff-9a5e-cedfcc63b48b" class="cta-btn">Get the Course →</a>
+    </div>
+
+    <!-- Telegram -->
+    <div class="telegram-section">
+        <p>Have questions? Don't be shy — I respond to everyone.</p>
+        <a href="https://t.me/pro_logic12" class="telegram-btn">💬 Write me on Telegram</a>
+    </div>
+
+</div>
+
+</body>
+</html>
